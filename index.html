@@ -1,0 +1,718 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Farm2Door — Farm Fresh (Bangladesh)</title>
+  <meta name="description" content="Farm2Door — Direct farm-to-door marketplace in Bangladesh. bKash/Nagad/Rocket support. Farmer onboarding, aggregation & delivery workflow." />
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --muted: #6b7280;
+      --accent: #0ea5a4; /* teal-ish */
+      --accent-2: #06b6d4;
+      --danger: #ef4444;
+      --glass: rgba(255,255,255,0.7);
+      --shadow: 0 6px 18px rgba(9,30,66,0.08);
+      --bd-radius: 12px;
+      --max-w: 1200px;
+      --bdt: "৳";
+      --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    html[data-theme="dark"]{
+      --bg: #0b1220;
+      --card: #111c2d;
+      --muted: #9aa6b2;
+      --glass: rgba(255,255,255,0.03);
+      color-scheme: dark;
+      color: var(--muted);
+    }
+    
+    html[data-theme="dark"] input, 
+    html[data-theme="dark"] select,
+    html[data-theme="dark"] textarea {
+      background-color: #0b1220;
+      border-color: #334155;
+      color: #e2e8f0;
+    }
+
+    html[data-theme="dark"] .btn {
+      background: #1e293b;
+      color: #e2e8f0;
+    }
+    html[data-theme="dark"] .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white}
+    html[data-theme="dark"] th { background: #1e293b; }
+
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--font-sans);
+      background:var(--bg);
+      color:#1f2937;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:24px;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .app{
+      width:100%;
+      max-width:var(--max-w);
+      background:transparent;
+    }
+
+    header.app-header{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      margin-bottom:18px;
+      flex-wrap: wrap;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      background:var(--card);
+      padding:10px 14px;
+      border-radius:10px;
+      box-shadow:var(--shadow);
+    }
+    .logo-mark{
+      width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:18px;
+    }
+    .brand h1{font-size:16px;margin:0}
+    .brand p{margin:0;font-size:12px;color:var(--muted)}
+
+    .controls{
+      margin-left:auto;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btns{
+      display:flex;
+      gap:8px;
+    }
+    .btn{
+      background:var(--card);
+      padding:8px 12px;border-radius:10px;border:0;cursor:pointer;box-shadow:var(--shadow);font-weight:600; font-family: var(--font-sans);
+    }
+    .btn.ghost{background:transparent;box-shadow:none;border:1px solid rgba(0,0,0,0.06)}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white}
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Google Translate placeholder size */
+    #google_translate_element{display:inline-block}
+
+    /* Scene container (SPA) */
+    .scene-wrap{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns: 1fr 320px;
+      gap:18px;
+      align-items:start;
+    }
+
+    /* Left column (pages) */
+    .pages{
+      background:var(--card);
+      border-radius:var(--bd-radius);
+      padding:18px;
+      box-shadow:var(--shadow);
+      min-height:520px;
+      overflow:hidden;
+      position:relative;
+    }
+
+    /* Right column: cart & admin quick actions */
+    aside.side-panel{
+      position:sticky;
+      top: 24px;
+      border-radius:var(--bd-radius);
+      background:var(--card);
+      padding:16px;
+      box-shadow:var(--shadow);
+      height:fit-content;
+    }
+    .side-panel h3{margin:0 0 8px 0}
+
+    /* Scenes */
+    .scene{position:absolute;left:0;top:0;width:100%;height:100%;padding:18px;transition:transform .45s cubic-bezier(.2,.9,.22,1),opacity .35s;will-change:transform,opacity; overflow-y: auto;}
+    .scene.hidden{transform:translateX(40px);opacity:0;pointer-events:none}
+    .scene.show{transform:translateX(0);opacity:1;pointer-events:auto}
+
+    /* hero */
+    .hero{ display:flex; gap:18px; align-items:center; margin-bottom:12px; }
+    .hero .intro{flex:1}
+    .hero h2{margin:0 0 6px 0}
+    .hero p{margin:0;color:var(--muted)}
+    .hero-cta{display:flex;gap:8px; margin-top:10px}
+
+    /* marketplace grid */
+    .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; margin-top:12px; }
+
+    .card{
+      background:linear-gradient(180deg,transparent, rgba(0,0,0,0.02));
+      border-radius:10px;padding:12px;
+      display:flex;flex-direction:column;gap:10px;align-items:stretch;
+      box-shadow:0 6px 16px rgba(10,10,10,0.03);
+    }
+    .card img{width:100%;height:130px;object-fit:cover;border-radius:8px}
+    .card .meta{display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .card .meta h4{margin:0;font-size:15px}
+    .card .meta small{font-size:12px;color:var(--muted)}
+    .card .price{font-weight:700;color:var(--accent)}
+    .card .seller{font-size:12px;color:var(--muted)}
+    .card .row{display:flex;gap:8px;align-items:center}
+    .qty{width:68px;padding:6px;border-radius:8px;border:1px solid #e6eef0;text-align:center}
+    .card .add{margin-left:auto}
+
+    /* cart */
+    .cart-item{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px dashed rgba(0,0,0,0.04)}
+    .cart-item .name{flex:1}
+    .cart-summary{padding-top:8px;margin-top:8px;border-top:1px solid rgba(0,0,0,0.04)}
+    .muted{color:var(--muted);font-size:13px}
+
+    /* forms */
+    label{display:block;font-size:13px;margin:6px 0 4px 0}
+    input,select,textarea{width:100%;padding:8px;border-radius:8px;border:1px solid #E6EEF0;font-size:14px;background:transparent}
+    textarea{min-height:80px}
+
+    /* small badges */
+    .badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#f1f6f5;color:#065f66;font-weight:700;font-size:12px}
+
+    /* aggregation table */
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:8px;border-bottom:1px solid rgba(0,0,0,0.06);text-align:left;font-size:14px}
+    th{background:transparent;color:var(--muted);font-weight:600}
+
+    /* footer */
+    footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
+
+    /* small screens */
+    @media (max-width:980px){
+      .scene-wrap{grid-template-columns:1fr}
+      aside.side-panel{order:3; position: static;}
+      .pages{order:1}
+    }
+    @media (max-width:768px){
+      .nav-btns { display: none; } /* Hide main nav on mobile, could be replaced with hamburger */
+      .controls {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .brand h1 { font-size: 14px; }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="app" role="application" aria-label="Farm2Door Marketplace">
+
+    <header class="app-header">
+      <div class="brand">
+        <div class="logo-mark">F2D</div>
+        <div>
+          <h1>Farm2Door BD</h1>
+          <p>সরাসরি খামার থেকে আপনার দরজায়</p>
+        </div>
+      </div>
+
+      <div class="controls" aria-hidden="false">
+        <div class="nav-btns" role="navigation" aria-label="Scene switcher">
+          <button class="btn" data-target="market" title="Marketplace">Marketplace</button>
+          <button class="btn" data-target="onboard" title="Farmer Onboarding">Farmer Onboard</button>
+          <button class="btn" data-target="aggregate" title="Aggregation Center">Aggregation</button>
+          <button class="btn" data-target="orders" title="Orders & QC">Orders</button>
+        </div>
+
+        <div id="google_translate_element" aria-hidden="false" style="margin-left:6px"></div>
+
+        <button class="btn ghost" id="themeToggle" title="Toggle Light/Dark">🌗</button>
+        <button class="btn primary" id="openCartBtn" title="Open cart">Cart (<span id="cartCount">0</span>)</button>
+      </div>
+    </header>
+
+    <div class="scene-wrap">
+
+      <section class="pages" id="pages">
+
+        <div id="scene-market" class="scene show" data-scene="market">
+          <div class="hero">
+            <div class="intro">
+              <h2>Farm → City: Fresh goods, direct prices</h2>
+              <p>Cut the middlemen. Verified local farmer collectives. Choose delivery slot, pay via bKash/Nagad/Rocket or COD.</p>
+              <div class="hero-cta">
+                <button class="btn primary" onclick="document.querySelector('[data-target=market]').click()">Shop Now</button>
+                <button class="btn" onclick="document.querySelector('[data-target=onboard]').click()">Become a Supplier</button>
+              </div>
+            </div>
+          </div>
+
+          <h3>Available Today — Seasonal & Verified</h3>
+          <div class="grid" id="productGrid" aria-live="polite"></div>
+
+        </div>
+
+        <div id="scene-onboard" class="scene hidden" data-scene="onboard">
+          <h3>Farmer Collective Onboarding</h3>
+          <p class="muted">Local farmer groups & cooperatives — submit details to be verified.</p>
+
+          <form id="onboardForm" style="margin-top:12px">
+            <label>Collective / Farmer Group Name</label>
+            <input required id="fg_name" placeholder="e.g. Bagerhat Mango Collective" />
+            <label>Leader / Contact Person</label>
+            <input required id="fg_contact" placeholder="Name & phone (e.g. Rahim - 01xxxxxxxxx)" />
+            <label>Location (District / Upazila)</label>
+            <input required id="fg_location" placeholder="Dhaka, Savar / Netrokona, etc" />
+            <label>Products you supply (comma separated)</label>
+            <input required id="fg_products" placeholder="mango, potato, tilapia, chicken" />
+            <label>MFS (bKash/Nagad/Rocket) Number</label>
+            <input required id="fg_mfs" placeholder="01XXXXXXXXX" />
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <button class="btn primary" type="submit">Submit for Verification</button>
+              <button class="btn" type="button" id="viewSuppliersBtn">View Verified Suppliers</button>
+            </div>
+          </form>
+          <div id="supplierList" style="margin-top:16px"></div>
+        </div>
+
+        <div id="scene-aggregate" class="scene hidden" data-scene="aggregate">
+          <h3>Order Aggregation Center</h3>
+          <p class="muted">Pick a date and delivery slot to aggregate orders for supplier pickup.</p>
+          <div style="display:flex;gap:8px;align-items:center;margin-top:10px">
+            <input type="date" id="aggDate" />
+            <select id="aggSlot">
+              <option value="morning">Morning (7-10)</option>
+              <option value="afternoon">Afternoon (12-15)</option>
+              <option value="evening">Evening (17-20)</option>
+            </select>
+            <button class="btn primary" id="runAgg">Aggregate Orders</button>
+          </div>
+          <div id="aggResult" style="margin-top:12px"></div>
+        </div>
+
+        <div id="scene-orders" class="scene hidden" data-scene="orders">
+          <h3>Orders & QC / Delivery</h3>
+          <p class="muted">Track placed orders, perform QC, assign riders and complete deliveries.</p>
+          <div id="ordersList" style="margin-top:12px"></div>
+        </div>
+
+      </section>
+
+      <aside class="side-panel" aria-label="Cart and Quick Info">
+        <h3>Cart</h3>
+        <div id="cartList"><div class="muted">Cart is empty — add items</div></div>
+        <div class="cart-summary" style="margin-top:12px">
+          <div style="display:flex;justify-content:space-between"><div class="muted">Subtotal</div><div id="subtotal">৳ 0</div></div>
+          <label style="margin-top:10px">Delivery Slot</label>
+          <input type="date" id="deliveryDate" />
+          <select id="deliveryWindow" style="margin-top:6px">
+            <option value="morning">Morning (7-10)</option>
+            <option value="afternoon">Afternoon (12-15)</option>
+            <option value="evening">Evening (17-20)</option>
+          </select>
+          <label style="margin-top:8px">Payment Method</label>
+          <select id="paymentMethod">
+            <option value="cod">Cash on Delivery (COD)</option>
+            <option value="bkash">bKash</option>
+            <option value="nagad">Nagad</option>
+            <option value="rocket">Rocket</option>
+          </select>
+          <div id="mfsInstruction" class="muted" style="margin-top:8px; padding:8px; border-radius:6px; background: rgba(0,0,0,0.03);">Select an MFS option to see payment instructions.</div>
+          <button class="btn primary" id="placeOrderBtn" style="width:100%;margin-top:10px">Place Order</button>
+        </div>
+        <hr style="margin:12px 0;border:none;border-top:1px solid rgba(0,0,0,0.04)">
+        <h3>Quick Admin</h3>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn" onclick="document.querySelector('[data-target=aggregate]').click()">Go to Aggregation</button>
+          <button class="btn" onclick="document.querySelector('[data-target=orders]').click()">View Orders</button>
+          <button class="btn" id="clearDataBtn" style="color:var(--danger)">⚠️ Reset Demo Data</button>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <div id="orderModal" style="display:none;position:fixed;left:0;top:0;width:100%;height:100%;align-items:center;justify-content:center;background:rgba(0,0,0,0.45); z-index: 100;">
+    <div style="background:var(--card);padding:24px;border-radius:10px;width:90%; max-width:480px;box-shadow:var(--shadow)">
+      <h3>Complete Your Order</h3>
+      <div style="margin-top:16px">
+        <label>Full Name</label><input id="custName" placeholder="Your full name" />
+        <label style="margin-top:8px">Phone Number</label><input id="custPhone" placeholder="01XXXXXXXXX" />
+        <label style="margin-top:8px">Full Delivery Address</label><textarea id="custAddress" placeholder="House, Road, Area, City"></textarea>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+        <button class="btn" id="cancelOrderModal">Cancel</button>
+        <button class="btn primary" id="confirmOrderBtn">Confirm Order</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+    }
+  </script>
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+  <script>
+    /****************************************************************
+     * Farm2Door — Frontend single-file app
+     ****************************************************************/
+
+    /* -----------------------
+       DOM Elements
+       ----------------------- */
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+    
+    /* -----------------------
+       Local Data Simulation
+       ----------------------- */
+    const SampleSuppliers = [
+      {id: 's1', name: 'Bagerhat Mango Collective', location: 'Bagerhat, Khulna', mfs:'01710000001', verified:true, products:'mango'},
+      {id: 's2', name: 'Netrokona Vegetable Coop', location: 'Netrokona', mfs:'01710000002', verified:true, products:'potatoes, spring onion'},
+      {id: 's3', name: 'Chattogram Tilapia Farm', location: 'Feni', mfs:'01710000003', verified:true, products:'tilapia fish'},
+      {id: 's4', name: 'Gazipur Poultry Supplier', location: 'Gazipur', mfs:'01710000004', verified:true, products:'fresh chicken'}
+    ];
+    const SampleProducts = [
+      {id:'p1', title:'Mango (Langra)', unit:'kg', price:280, supplier:'s1', img:'https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?q=80&w=400&auto=format&fit=crop'},
+      {id:'p2', title:'Potatoes', unit:'kg', price:45, supplier:'s2', img:'https://images.unsplash.com/photo-1518977676601-b53f82aba655?q=80&w=400&auto=format&fit=crop'},
+      {id:'p3', title:'Tilapia Fish', unit:'kg', price:420, supplier:'s3', img:'https://images.unsplash.com/photo-1598515598522-257367b625d3?q=80&w=400&auto=format&fit=crop'},
+      {id:'p4', title:'Fresh Chicken (whole)', unit:'pc', price:360, supplier:'s4', img:'https://images.unsplash.com/photo-1604908176991-6a8a6a5e4013?q=80&w=400&auto=format&fit=crop'},
+      {id:'p5', title:'Spring Onion', unit:'bunch', price:25, supplier:'s2', img:'https://images.unsplash.com/photo-1587428120153-2c1b72b8346e?q=80&w=400&auto=format&fit=crop'}
+    ];
+    
+    const storage = {
+      get: (k, fallback = null) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; } },
+      set: (k, v) => localStorage.setItem(k, JSON.stringify(v)),
+    };
+
+    function initData() {
+        if (!storage.get('suppliers')) storage.set('suppliers', SampleSuppliers);
+        if (!storage.get('products')) storage.set('products', SampleProducts);
+        if (!storage.get('cart')) storage.set('cart', []);
+        if (!storage.get('orders')) storage.set('orders', []);
+    }
+
+    /* -----------------------
+       Rendering Functions
+       ----------------------- */
+    function renderProducts() {
+      const products = storage.get('products', []);
+      const suppliers = storage.get('suppliers', []);
+      const grid = $('#productGrid');
+      grid.innerHTML = products.map(p => {
+        const sup = suppliers.find(s => s.id === p.supplier) || { name: 'N/A' };
+        return `
+          <div class="card">
+            <img src="${p.img}" alt="${p.title}" loading="lazy" />
+            <div class="meta"><h4>${p.title}</h4><div class="price">৳ ${p.price}/${p.unit}</div></div>
+            <div class="muted">${sup.name}</div>
+            <div class="row">
+              <input class="qty" type="number" min="0.25" step="0.25" value="1" id="qty-${p.id}" />
+              <button class="btn primary add" data-add="${p.id}" style="margin-left:auto;">Add</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    function renderCart() {
+      const cart = storage.get('cart', []);
+      const products = storage.get('products', []);
+      const cartList = $('#cartList');
+      const cartCountEl = $('#cartCount');
+      
+      if (cart.length === 0) {
+        cartList.innerHTML = '<div class="muted">Cart is empty</div>';
+        cartCountEl.textContent = '0';
+        $('#subtotal').textContent = '৳ 0';
+        $('#placeOrderBtn').disabled = true;
+        return;
+      }
+      
+      $('#placeOrderBtn').disabled = false;
+      cartCountEl.textContent = cart.length;
+      let subtotal = 0;
+      
+      cartList.innerHTML = cart.map(item => {
+        const p = products.find(prod => prod.id === item.productId);
+        if (!p) return '';
+        const itemTotal = p.price * item.qty;
+        subtotal += itemTotal;
+        return `
+          <div class="cart-item">
+            <div class="name">
+              <div>${p.title}</div>
+              <div class="muted">${item.qty} ${p.unit} &times; ৳${p.price}</div>
+            </div>
+            <div style="font-weight:600">৳ ${itemTotal.toFixed(0)}</div>
+            <button class="btn ghost" data-rm="${item.productId}" style="padding:4px 8px;">✕</button>
+          </div>
+        `;
+      }).join('');
+
+      $('#subtotal').textContent = `৳ ${Math.round(subtotal)}`;
+    }
+
+    function renderSuppliers() {
+      const suppliers = storage.get('suppliers', []);
+      $('#supplierList').innerHTML = `<h4>Verified Suppliers</h4><table>
+        <thead><tr><th>Name</th><th>Location</th><th>Products</th></tr></thead>
+        <tbody>
+          ${suppliers.filter(s => s.verified).map(s => `
+            <tr><td>${s.name}</td><td>${s.location}</td><td>${s.products}</td></tr>
+          `).join('')}
+        </tbody>
+      </table>`;
+    }
+
+    function renderOrdersList() {
+      const orders = storage.get('orders', []);
+      const products = storage.get('products', []);
+      const ordersListEl = $('#ordersList');
+      if (orders.length === 0) {
+        ordersListEl.innerHTML = `<p class="muted">No orders found.</p>`;
+        return;
+      }
+      ordersListEl.innerHTML = orders.reverse().map(o => `
+        <div class="card" style="margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between;">
+            <strong>Order #${o.id.slice(-6)}</strong>
+            <span class="badge">${o.status}</span>
+          </div>
+          <div class="muted">Placed: ${new Date(o.placedAt).toLocaleString()} for ${o.deliveryDate} (${o.deliveryWindow})</div>
+          <div class="muted">Customer: ${o.customer.name} (${o.customer.phone})</div>
+          <table style="margin-top:8px;">
+            ${o.items.map(i => {
+              const p = products.find(prod => prod.id === i.productId);
+              return `<tr><td>${p.title}</td><td>${i.qty} ${p.unit}</td></tr>`;
+            }).join('')}
+          </table>
+          <div style="text-align:right; font-weight:bold; margin-top:8px;">Total: ৳ ${o.total} (${o.paymentMethod.toUpperCase()})</div>
+          <div style="margin-top:10px; display:flex; gap:8px;">
+            ${o.status === 'Pending' ? `<button class="btn" data-status-update="${o.id}:QC Passed">Pass QC</button>` : ''}
+            ${o.status === 'QC Passed' ? `<button class="btn" data-status-update="${o.id}:Out for Delivery">Send for Delivery</button>` : ''}
+            ${o.status === 'Out for Delivery' ? `<button class="btn primary" data-status-update="${o.id}:Delivered">Mark Delivered</button>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    /* -----------------------
+       Core Logic
+       ----------------------- */
+    function addToCart(productId, qty) {
+      qty = parseFloat(qty);
+      if (isNaN(qty) || qty <= 0) return alert('Invalid quantity');
+      const cart = storage.get('cart', []);
+      const existing = cart.find(i => i.productId === productId);
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        cart.push({ productId, qty });
+      }
+      storage.set('cart', cart);
+      renderCart();
+    }
+    
+    function removeFromCart(productId) {
+        storage.set('cart', storage.get('cart', []).filter(i => i.productId !== productId));
+        renderCart();
+    }
+
+    function showScene(targetScene) {
+      $$('.scene').forEach(s => {
+        s.classList.toggle('hidden', s.dataset.scene !== targetScene);
+        s.classList.toggle('show', s.dataset.scene === targetScene);
+      });
+      // Auto-run functions when switching to certain scenes
+      if (targetScene === 'orders') renderOrdersList();
+      if (targetScene === 'onboard') renderSuppliers();
+      if (targetScene === 'aggregate') $('#aggDate').valueAsDate = new Date();
+    }
+
+    /* -----------------------
+       Event Listeners
+       ----------------------- */
+    document.addEventListener('DOMContentLoaded', () => {
+      initData();
+      renderProducts();
+      renderCart();
+      showScene('market');
+      $('#deliveryDate').valueAsDate = new Date(); // Set default delivery date to today
+
+      // Scene Switchers
+      $$('[data-target]').forEach(btn => {
+        btn.addEventListener('click', () => showScene(btn.dataset.target));
+      });
+
+      // Add to Cart
+      $('#productGrid').addEventListener('click', e => {
+        if (e.target.matches('[data-add]')) {
+          const id = e.target.dataset.add;
+          const qty = $(`#qty-${id}`).value;
+          addToCart(id, qty);
+        }
+      });
+      
+      // Remove from Cart
+      $('#cartList').addEventListener('click', e => {
+        if (e.target.matches('[data-rm]')) {
+          removeFromCart(e.target.dataset.rm);
+        }
+      });
+      
+      // MFS Instructions
+      $('#paymentMethod').addEventListener('change', e => {
+        const method = e.target.value;
+        const mfsEl = $('#mfsInstruction');
+        if (method === 'bkash') mfsEl.textContent = "Pay to bKash Merchant: 01... and enter TrxID.";
+        else if (method === 'nagad') mfsEl.textContent = "Pay to Nagad Merchant: 01... and enter TrxID.";
+        else if (method === 'rocket') mfsEl.textContent = "Pay to Rocket Merchant: 01... and enter TrxID.";
+        else mfsEl.textContent = "You will pay the rider upon delivery.";
+      });
+      
+      // Place Order Flow
+      $('#placeOrderBtn').addEventListener('click', () => $('#orderModal').style.display = 'flex');
+      $('#cancelOrderModal').addEventListener('click', () => $('#orderModal').style.display = 'none');
+      $('#confirmOrderBtn').addEventListener('click', () => {
+        const order = {
+            id: 'o' + Date.now(),
+            customer: { name: $('#custName').value, phone: $('#custPhone').value, address: $('#custAddress').value },
+            items: storage.get('cart', []),
+            total: Math.round(storage.get('cart', []).reduce((sum, item) => {
+                const p = storage.get('products').find(prod => prod.id === item.productId);
+                return sum + (p.price * item.qty);
+            }, 0)),
+            placedAt: new Date().toISOString(),
+            deliveryDate: $('#deliveryDate').value,
+            deliveryWindow: $('#deliveryWindow').value,
+            paymentMethod: $('#paymentMethod').value,
+            status: 'Pending'
+        };
+        if (!order.customer.name || !order.customer.phone || !order.customer.address) return alert('Please fill all customer details.');
+        
+        const allOrders = storage.get('orders', []);
+        allOrders.push(order);
+        storage.set('orders', allOrders);
+        storage.set('cart', []);
+        
+        renderCart();
+        $('#orderModal').style.display = 'none';
+        alert(`Order confirmed! Your Order ID: ${order.id.slice(-6)}`);
+      });
+      
+      // Farmer Onboarding
+      $('#onboardForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const newSupplier = {
+            id: 's' + Date.now(),
+            name: $('#fg_name').value,
+            contact: $('#fg_contact').value,
+            location: $('#fg_location').value,
+            products: $('#fg_products').value,
+            mfs: $('#fg_mfs').value,
+            verified: false // A real system would have a verification step
+        };
+        const suppliers = storage.get('suppliers', []);
+        suppliers.push(newSupplier);
+        storage.set('suppliers', suppliers);
+        alert(`${newSupplier.name} submitted for verification! For this demo, they won't appear in the list until 'verified' is set to true.`);
+        e.target.reset();
+      });
+      $('#viewSuppliersBtn').addEventListener('click', renderSuppliers);
+      
+      // Order Aggregation
+      $('#runAgg').addEventListener('click', () => {
+        const date = $('#aggDate').value;
+        const slot = $('#aggSlot').value;
+        const orders = storage.get('orders', []).filter(o => o.deliveryDate === date && o.deliveryWindow === slot);
+        if (orders.length === 0) {
+          $('#aggResult').innerHTML = `<p class="muted">No orders found for ${date} (${slot}).</p>`;
+          return;
+        }
+        
+        const aggregation = {};
+        const products = storage.get('products', []);
+        const suppliers = storage.get('suppliers', []);
+
+        orders.forEach(order => {
+            order.items.forEach(item => {
+                const product = products.find(p => p.id === item.productId);
+                if (!aggregation[item.productId]) {
+                    aggregation[item.productId] = { totalQty: 0, product, supplier: suppliers.find(s => s.id === product.supplier) };
+                }
+                aggregation[item.productId].totalQty += item.qty;
+            });
+        });
+        
+        $('#aggResult').innerHTML = `<h4>Pickup List for ${date} (${slot})</h4><table>
+            <thead><tr><th>Product</th><th>Total Quantity</th><th>Unit</th><th>Supplier</th><th>Contact</th></tr></thead>
+            <tbody>
+              ${Object.values(aggregation).map(agg => `
+                <tr>
+                  <td>${agg.product.title}</td>
+                  <td>${agg.totalQty.toFixed(2)}</td>
+                  <td>${agg.product.unit}</td>
+                  <td>${agg.supplier.name}</td>
+                  <td>${agg.supplier.mfs}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+        </table>`;
+      });
+      
+      // Order Status Update
+      $('#ordersList').addEventListener('click', e => {
+        if (e.target.matches('[data-status-update]')) {
+            const [orderId, newStatus] = e.target.dataset.statusUpdate.split(':');
+            const orders = storage.get('orders', []);
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                order.status = newStatus;
+                storage.set('orders', orders);
+                renderOrdersList();
+            }
+        }
+      });
+      
+      // Theme Toggle
+      $('#themeToggle').addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        storage.set('theme', newTheme);
+      });
+      
+      // Reset Data
+      $('#clearDataBtn').addEventListener('click', () => {
+          if (confirm('Are you sure you want to reset all demo data (orders, suppliers, cart)?')) {
+              localStorage.clear();
+              initData();
+              window.location.reload();
+          }
+      });
+      
+      // Load saved theme
+      const savedTheme = storage.get('theme', 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    });
+  </script>
+</body>
+</html>
